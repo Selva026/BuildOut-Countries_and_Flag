@@ -13,49 +13,45 @@ const CountryCard = ({ flag, name }) => {
 const API = "https://xcountries-backend.azurewebsites.net/all";
 
 function Countries() {
-    const [data, setData] = useState([]); // Stores API data
-    const [error, setError] = useState(null); // Tracks any API errors
-    const [loading, setLoading] = useState(true); // Tracks loading state
+    const [data, setData] = useState([]); // State for countries data
+    const [error, setError] = useState(null); // State for error tracking
+    const [loading, setLoading] = useState(true); // State for loading tracking
 
     useEffect(() => {
         const fetchCountries = async () => {
             try {
                 const response = await fetch(API);
 
-                // Handle HTTP errors
                 if (!response.ok) {
                     throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
                 }
 
                 const jsonData = await response.json();
                 setData(jsonData);
-            } catch (error) {
-                setError(error.message); // Set error state if something goes wrong
-                console.error("Error fetching countries:", error);
+            } catch (err) {
+                console.error("Error fetching data:", err.message); // Log error to console
+                setError(err.message); // Update error state
             } finally {
-                setLoading(false); // End loading state regardless of success or failure
+                setLoading(false); // Ensure loading ends
             }
         };
 
         fetchCountries();
     }, []);
 
-    // Render loading message while fetching data
     if (loading) {
         return <div className={styles.Loading}>Loading countries...</div>;
     }
 
-    // Render error message if an error occurs
     if (error) {
-        return <div className={styles.Error}>Error: {error}</div>;
+        return <div className={styles.Error}>Error fetching data: {error}</div>;
     }
 
-    // Render countries if data is successfully fetched
     return (
         <div className={styles.Countries}>
             {data.map((country) => (
                 <CountryCard
-                    key={country.abbr || country.name} // Use abbr as unique key, fallback to name
+                    key={country.abbr || country.name}
                     name={country.name}
                     flag={country.flag}
                 />
